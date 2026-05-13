@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SM Tracker — Controle de Posts</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-<style>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"><style>
   :root {
     --bg: #0d0d0f;
     --surface: #15151a;
@@ -49,9 +48,7 @@
     z-index: 1;
   }
 
-  header {
-    margin-bottom: 40px;
-  }
+  header { margin-bottom: 40px; }
 
   .logo {
     display: flex;
@@ -156,8 +153,7 @@
   }
 
   textarea { resize: vertical; min-height: 70px; }
-
-  .upload-zone {
+</style>.upload-zone {
     border: 2px dashed var(--border);
     border-radius: 12px;
     padding: 32px 20px;
@@ -305,9 +301,7 @@
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  .history {
-    margin-top: 8px;
-  }
+  .history { margin-top: 8px; }
 
   .history-item {
     display: flex;
@@ -339,9 +333,7 @@
   }
 </style>
 </head>
-<body>
-
-<div class="bg-orb orb1"></div>
+<body><div class="bg-orb orb1"></div>
 <div class="bg-orb orb2"></div>
 
 <div class="container">
@@ -353,7 +345,6 @@
     <p class="subtitle">Mande o print do Instagram · Os dados vão direto pra planilha</p>
   </header>
 
-  <!-- STEP 1: Upload + Config -->
   <div class="card" id="step1">
     <div class="card-title">1. Print do post</div>
 
@@ -449,7 +440,6 @@
     <div id="analyzeStatus" class="hidden"></div>
   </div>
 
-  <!-- STEP 2: Dados extraídos -->
   <div class="card hidden" id="step2">
     <div class="card-title">3. Dados extraídos — confirme antes de enviar</div>
 
@@ -494,25 +484,21 @@
     <div id="sendStatus" class="hidden"></div>
   </div>
 
-  <!-- Histórico -->
   <div class="card hidden" id="historyCard">
     <div class="card-title">Enviados hoje</div>
     <div class="history" id="historyList"></div>
   </div>
 
-</div>
-
-<script>
+</div><script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMe31CM6KLDoe-AYDtcXQVCdzZm_hLidBclwQvqUhqz3tMczCgCzF6Rs8NF62LgPxsSw/exec";
-const CLAUDE_API = "https://api.anthropic.com/v1/messages";
+const GEMINI_KEY = "AIzaSyD5WmCoa7bbHDxLSh0UEVB6r8Uim1gayHQ";
+const GEMINI_API = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
 
 let imageBase64 = null;
 let history = [];
 
-// Set today's date as default
 document.getElementById('dataPost').valueAsDate = new Date();
 
-// Drag and drop
 const zone = document.getElementById('uploadZone');
 zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
 zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
@@ -557,18 +543,11 @@ function showStatus(el, type, msg) {
 }
 
 async function analyzeImage() {
-  if (!imageBase64) {
-    alert('Sobe o print primeiro!');
-    return;
-  }
+  if (!imageBase64) { alert('Sobe o print primeiro!'); return; }
 
   const cliente = document.getElementById('cliente').value;
   const sm = document.getElementById('smResponsavel').value;
-
-  if (!cliente || !sm) {
-    alert('Selecione o cliente e o SM responsável!');
-    return;
-  }
+  if (!cliente || !sm) { alert('Selecione o cliente e o SM responsável!'); return; }
 
   const btn = document.getElementById('analyzeBtn');
   const statusEl = document.getElementById('analyzeStatus');
@@ -576,22 +555,7 @@ async function analyzeImage() {
   showStatus(statusEl, 'loading', 'Analisando o print com IA...');
 
   try {
-    const res = await fetch(CLAUDE_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 }
-            },
-            {
-              type: 'text',
-              text: `Analise este print de Insights do Instagram e extraia os dados. Responda APENAS em JSON válido, sem markdown, sem texto extra:
+    const prompt = `Analise este print de Insights do Instagram e extraia os dados. Responda APENAS em JSON válido, sem markdown, sem texto extra:
 {
   "curtidas": número,
   "comentarios": número,
@@ -602,19 +566,26 @@ async function analyzeImage() {
   "data_post": "DD/MM/AAAA" ou null,
   "descricao": "texto visível no post ou descrição curta do conteúdo"
 }
-Converta "mil" para número (ex: 6,6 mil = 6600). Se algum dado não aparecer, use null.`
-            }
+Converta "mil" para número (ex: 6,6 mil = 6600). Se algum dado não aparecer, use null.`;
+
+    const res = await fetch(GEMINI_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { inline_data: { mime_type: 'image/jpeg', data: imageBase64 } },
+            { text: prompt }
           ]
         }]
       })
     });
 
     const data = await res.json();
-    const text = data.content.map(i => i.text || '').join('');
+    const text = data.candidates[0].content.parts[0].text;
     const clean = text.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
 
-    // Preenche os campos
     document.getElementById('curtidas').value = parsed.curtidas || '';
     document.getElementById('comentarios').value = parsed.comentarios || '';
     document.getElementById('compartilhamentos').value = parsed.compartilhamentos || '';
@@ -633,7 +604,6 @@ Converta "mil" para número (ex: 6,6 mil = 6600). Se algum dado não aparecer, u
       }
     }
 
-    // Monta metrics cards
     const metrics = [
       { label: 'Curtidas', value: fmt(parsed.curtidas) },
       { label: 'Comentários', value: fmt(parsed.comentarios) },
@@ -689,7 +659,6 @@ async function sendToSheets() {
   const alcance = parseInt(document.getElementById('alcance').value) || 0;
   const eng = calcEngajamento();
 
-  // Formata data
   let dataFormatada = '';
   if (dataVal) {
     const [y, m, d] = dataVal.split('-');
@@ -713,7 +682,6 @@ async function sendToSheets() {
 
     showStatus(statusEl, 'success', `Adicionado na aba "${cliente}" com sucesso!`);
 
-    // Histórico
     history.unshift({
       texto: `${cliente} · ${sm} · ${formato} · ${dataFormatada}`,
       hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
@@ -722,7 +690,6 @@ async function sendToSheets() {
     renderHistory();
     document.getElementById('historyCard').classList.remove('hidden');
 
-    // Reset após 3s
     setTimeout(() => {
       document.getElementById('step2').classList.add('hidden');
       clearImage();
