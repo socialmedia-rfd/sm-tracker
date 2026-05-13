@@ -3,514 +3,177 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SM Tracker — Controle de Posts</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"><style>
-  :root {
-    --bg: #0d0d0f;
-    --surface: #15151a;
-    --surface2: #1d1d24;
-    --border: #2a2a35;
-    --accent: #7c6af7;
-    --accent2: #c084fc;
-    --green: #34d399;
-    --yellow: #fbbf24;
-    --red: #f87171;
-    --text: #f0f0f5;
-    --text2: #9090a8;
-    --text3: #5a5a72;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    padding: 32px 24px;
-  }
-
-  .bg-orb {
-    position: fixed;
-    width: 500px; height: 500px;
-    border-radius: 50%;
-    filter: blur(120px);
-    pointer-events: none;
-    z-index: 0;
-  }
-  .orb1 { background: rgba(124,106,247,0.12); top: -100px; right: -100px; }
-  .orb2 { background: rgba(192,132,252,0.07); bottom: -100px; left: -100px; }
-
-  .container {
-    max-width: 760px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-  }
-
-  header { margin-bottom: 40px; }
-
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
-  }
-
-  .logo-icon {
-    width: 36px; height: 36px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-  }
-
-  h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 28px;
-    font-weight: 800;
-    background: linear-gradient(135deg, #fff 0%, var(--accent2) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .subtitle {
-    color: var(--text2);
-    font-size: 14px;
-    font-weight: 300;
-    margin-top: 4px;
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    margin-bottom: 16px;
-  }
-
-  .card-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text2);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .card-title::before {
-    content: '';
-    display: inline-block;
-    width: 3px; height: 14px;
-    background: linear-gradient(var(--accent), var(--accent2));
-    border-radius: 2px;
-  }
-
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-  .span-2 { grid-column: span 2; }
-
-  .field { display: flex; flex-direction: column; gap: 6px; }
-
-  label {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  input, select, textarea {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    padding: 11px 14px;
-    width: 100%;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    outline: none;
-    -webkit-appearance: none;
-  }
-
-  input:focus, select:focus, textarea:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(124,106,247,0.15);
-  }
-
-  select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239090a8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    padding-right: 36px;
-    cursor: pointer;
-  }
-
-  textarea { resize: vertical; min-height: 70px; }
-</style>.upload-zone {
-    border: 2px dashed var(--border);
-    border-radius: 12px;
-    padding: 32px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: var(--surface2);
-    position: relative;
-  }
-
-  .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: rgba(124,106,247,0.05); }
-
-  .upload-zone input[type=file] {
-    position: absolute; inset: 0;
-    opacity: 0; cursor: pointer;
-    width: 100%; height: 100%;
-  }
-
-  .upload-icon { font-size: 28px; margin-bottom: 8px; }
-  .upload-text { font-size: 14px; color: var(--text2); }
-  .upload-hint { font-size: 12px; color: var(--text3); margin-top: 4px; }
-
-  .preview-wrap {
-    position: relative;
-    border-radius: 12px;
-    overflow: hidden;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-  }
-
-  .preview-wrap img {
-    width: 100%; max-height: 220px;
-    object-fit: contain;
-    display: block;
-  }
-
-  .preview-clear {
-    position: absolute; top: 8px; right: 8px;
-    background: rgba(0,0,0,0.7);
-    border: none; color: white;
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    cursor: pointer; font-size: 14px;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.2s;
-  }
-  .preview-clear:hover { background: var(--red); }
-
-  .analyze-btn {
-    width: 100%;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border: none;
-    border-radius: 12px;
-    color: white;
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    padding: 14px;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.1s;
-    letter-spacing: 0.04em;
-    margin-top: 4px;
-  }
-
-  .analyze-btn:hover { opacity: 0.9; }
-  .analyze-btn:active { transform: scale(0.99); }
-  .analyze-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-  }
-
-  .metric-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px;
-    text-align: center;
-  }
-
-  .metric-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text3);
-    margin-bottom: 6px;
-  }
-
-  .metric-value {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .metric-value.accent { color: var(--accent2); }
-
-  .send-btn {
-    width: 100%;
-    background: var(--green);
-    border: none;
-    border-radius: 12px;
-    color: #0d1a12;
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    padding: 14px;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.1s;
-    letter-spacing: 0.04em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  .send-btn:hover { opacity: 0.9; }
-  .send-btn:active { transform: scale(0.99); }
-  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .status-bar {
-    border-radius: 10px;
-    padding: 12px 16px;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 12px;
-  }
-
-  .status-bar.loading { background: rgba(124,106,247,0.12); color: var(--accent2); border: 1px solid rgba(124,106,247,0.2); }
-  .status-bar.success { background: rgba(52,211,153,0.1); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
-  .status-bar.error { background: rgba(248,113,113,0.1); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
-
-  .spinner {
-    width: 16px; height: 16px;
-    border: 2px solid rgba(124,106,247,0.3);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    flex-shrink: 0;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .history { margin-top: 8px; }
-
-  .history-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    margin-bottom: 8px;
-    font-size: 13px;
-    animation: fadeIn 0.3s ease;
-  }
-
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
-
-  .history-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
-  .history-text { flex: 1; color: var(--text2); }
-  .history-time { color: var(--text3); font-size: 11px; white-space: nowrap; }
-
-  .divider { height: 1px; background: var(--border); margin: 6px 0 20px; }
-
-  .hidden { display: none !important; }
-
-  @media (max-width: 600px) {
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    .span-2 { grid-column: span 1; }
-    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-  }
+<title>SM Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0d0f;--s:#15151a;--s2:#1d1d24;--b:#2a2a35;--a:#7c6af7;--a2:#c084fc;--g:#34d399;--r:#f87171;--t:#f0f0f5;--t2:#9090a8;--t3:#5a5a72}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--t);font-family:'DM Sans',sans-serif;min-height:100vh;padding:32px 24px}
+.container{max-width:720px;margin:0 auto}
+h1{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;background:linear-gradient(135deg,#fff,var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{color:var(--t2);font-size:13px;margin-top:4px;margin-bottom:32px}
+.card{background:var(--s);border:1px solid var(--b);border-radius:16px;padding:24px;margin-bottom:16px}
+.ctitle{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t2);margin-bottom:16px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+label{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em}
+input,select,textarea{background:var(--s2);border:1px solid var(--b);border-radius:8px;color:var(--t);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;width:100%;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--a)}
+select{cursor:pointer}
+textarea{resize:vertical;min-height:60px}
+.upload{border:2px dashed var(--b);border-radius:10px;padding:28px;text-align:center;cursor:pointer;background:var(--s2);position:relative}
+.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload:hover{border-color:var(--a)}
+.prev{border-radius:10px;overflow:hidden;border:1px solid var(--b);margin-top:10px;position:relative}
+.prev img{width:100%;max-height:200px;object-fit:contain;display:block}
+.prev button{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.7);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px}
+.btn{width:100%;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;padding:13px;cursor:pointer;transition:opacity .2s;letter-spacing:.04em;margin-top:10px}
+.btn-ai{background:linear-gradient(135deg,var(--a),var(--a2));color:#fff}
+.btn-send{background:var(--g);color:#0d1a12;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.mc{background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:12px;text-align:center}
+.ml{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:4px}
+.mv{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--a2)}
+.status{border-radius:8px;padding:10px 14px;font-size:12px;display:flex;align-items:center;gap:8px;margin-top:10px}
+.status.loading{background:rgba(124,106,247,.1);color:var(--a2);border:1px solid rgba(124,106,247,.2)}
+.status.success{background:rgba(52,211,153,.1);color:var(--g);border:1px solid rgba(52,211,153,.2)}
+.status.error{background:rgba(248,113,113,.1);color:var(--r);border:1px solid rgba(248,113,113,.2)}
+.spin{width:14px;height:14px;border:2px solid rgba(124,106,247,.3);border-top-color:var(--a);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+.divider{height:1px;background:var(--b);margin:16px 0}
+@media(max-width:600px){.g2,.g3{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}}
 </style>
 </head>
-<body><div class="bg-orb orb1"></div>
-<div class="bg-orb orb2"></div>
+<body>
+  <div class="container">
+  <h1>📊 SM Tracker</h1>
+  <p class="sub">Sobe o print · A IA lê os dados · Vai direto pra planilha</p>
 
-<div class="container">
-  <header>
-    <div class="logo">
-      <div class="logo-icon">📊</div>
-      <h1>SM Tracker</h1>
-    </div>
-    <p class="subtitle">Mande o print do Instagram · Os dados vão direto pra planilha</p>
-  </header>
-
-  <div class="card" id="step1">
-    <div class="card-title">1. Print do post</div>
-
-    <div id="uploadZone" class="upload-zone">
+  <div class="card">
+    <div class="ctitle">1. Print do post</div>
+    <div class="upload" id="uploadZone">
       <input type="file" id="fileInput" accept="image/*">
-      <div class="upload-icon">📸</div>
-      <div class="upload-text">Clique ou arraste o print aqui</div>
-      <div class="upload-hint">PNG, JPG — print dos Insights do Instagram</div>
+      <div style="font-size:26px;margin-bottom:6px">📸</div>
+      <div style="font-size:13px;color:var(--t2)">Clique ou arraste o print aqui</div>
+      <div style="font-size:11px;color:var(--t3);margin-top:4px">PNG ou JPG — Insights do Instagram</div>
+    </div>
+    <div class="prev hidden" id="previewWrap">
+      <img id="previewImg" src="" alt="">
+      <button onclick="clearImage()">✕</button>
     </div>
 
-    <div id="previewWrap" class="preview-wrap hidden" style="margin-top:12px">
-      <img id="previewImg" src="" alt="preview">
-      <button class="preview-clear" onclick="clearImage()">✕</button>
-    </div>
+    <div class="divider"></div>
+    <div class="ctitle">2. Contexto do post</div>
 
-    <div style="margin-top:20px">
-      <div class="divider"></div>
-      <div class="card-title">2. Contexto do post</div>
-
-      <div class="grid-2" style="margin-bottom:14px">
-        <div class="field">
-          <label>Cliente / Perfil</label>
-          <select id="cliente">
-            <option value="">Selecione...</option>
-            <option>Mowana</option>
-            <option>Lamartine</option>
-            <option>Josué Brandão</option>
-            <option>Projeto Vida</option>
-            <option>Mevam</option>
-            <option>Igor Miguel</option>
-            <option>Fer Brunet</option>
-            <option>Carol Bazzo</option>
-            <option>Helena Tannure</option>
-            <option>John</option>
-            <option>Reforma Digital</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>SM Responsável</label>
-          <select id="smResponsavel">
-            <option value="">Selecione...</option>
-            <option>Sabine</option>
-            <option>Rúbia</option>
-            <option>Rafa</option>
-            <option>Bella</option>
-            <option>Carol</option>
-            <option>João</option>
-            <option>Thiago</option>
-          </select>
-        </div>
+    <div class="g2" style="margin-bottom:12px">
+      <div class="field">
+        <label>Cliente</label>
+        <select id="cliente">
+          <option value="">Selecione...</option>
+          <option>Mowana</option>
+          <option>Lamartine</option>
+          <option>Josué Brandão</option>
+          <option>Projeto Vida</option>
+          <option>Mevam</option>
+          <option>Igor Miguel</option>
+          <option>Fer Brunet</option>
+          <option>Carol Bazzo</option>
+          <option>Helena Tannure</option>
+          <option>John</option>
+          <option>Reforma Digital</option>
+        </select>
       </div>
-
-      <div class="grid-3" style="margin-bottom:14px">
-        <div class="field">
-          <label>Formato</label>
-          <select id="formato">
-            <option value="">Selecione...</option>
-            <option>Reels</option>
-            <option>Carrossel</option>
-            <option>Estático</option>
-            <option>Stories</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Tema</label>
-          <select id="tema">
-            <option value="">Selecione...</option>
-            <option>Lançamento</option>
-            <option>Institucional</option>
-            <option>Educativo</option>
-            <option>Devocional</option>
-            <option>Bastidor</option>
-            <option>CTA</option>
-            <option>Outro</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Data do Post</label>
-          <input type="date" id="dataPost">
-        </div>
-      </div>
-
-      <div class="field" style="margin-bottom:14px">
-        <label>Alcance (se não aparecer no print)</label>
-        <input type="number" id="alcanceManual" placeholder="ex: 65025">
+      <div class="field">
+        <label>SM Responsável</label>
+        <select id="smResponsavel">
+          <option value="">Selecione...</option>
+          <option>Sabine</option>
+          <option>Rúbia</option>
+          <option>Rafa</option>
+          <option>Bella</option>
+          <option>Carol</option>
+          <option>João</option>
+          <option>Thiago</option>
+        </select>
       </div>
     </div>
 
-    <button class="analyze-btn" id="analyzeBtn" onclick="analyzeImage()">
-      ✨ Analisar print com IA
-    </button>
+    <div class="g3" style="margin-bottom:12px">
+      <div class="field">
+        <label>Formato</label>
+        <select id="formato">
+          <option value="">Selecione...</option>
+          <option>Reels</option>
+          <option>Carrossel</option>
+          <option>Estático</option>
+          <option>Stories</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tema</label>
+        <select id="tema">
+          <option value="">Selecione...</option>
+          <option>Lançamento</option>
+          <option>Institucional</option>
+          <option>Educativo</option>
+          <option>Devocional</option>
+          <option>Bastidor</option>
+          <option>CTA</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Data do Post</label>
+        <input type="date" id="dataPost">
+      </div>
+    </div>
 
+    <div class="field" style="margin-bottom:12px">
+      <label>Alcance (se não aparecer no print)</label>
+      <input type="number" id="alcanceManual" placeholder="ex: 65025">
+    </div>
+
+    <button class="btn btn-ai" id="analyzeBtn" onclick="analyzeImage()">✨ Analisar print com IA</button>
     <div id="analyzeStatus" class="hidden"></div>
   </div>
 
   <div class="card hidden" id="step2">
-    <div class="card-title">3. Dados extraídos — confirme antes de enviar</div>
-
-    <div class="metrics-grid" id="metricsGrid" style="margin-bottom:20px"></div>
-
-    <div class="field" style="margin-bottom:14px">
+    <div class="ctitle">3. Confirme os dados</div>
+    <div class="metrics" id="metricsGrid"></div>
+    <div class="field" style="margin-bottom:12px">
       <label>Descrição do post</label>
-      <textarea id="descricaoPost" rows="2" placeholder="Ex: Existe um tipo de mulher que Deus está levantando..."></textarea>
+      <textarea id="descricaoPost" rows="2"></textarea>
     </div>
-
-    <div class="grid-3" style="margin-bottom:14px">
-      <div class="field">
-        <label>Curtidas</label>
-        <input type="number" id="curtidas">
-      </div>
-      <div class="field">
-        <label>Comentários</label>
-        <input type="number" id="comentarios">
-      </div>
-      <div class="field">
-        <label>Compartilhamentos</label>
-        <input type="number" id="compartilhamentos">
-      </div>
-      <div class="field">
-        <label>Salvamentos</label>
-        <input type="number" id="salvamentos">
-      </div>
-      <div class="field">
-        <label>Visualizações</label>
-        <input type="number" id="visualizacoes">
-      </div>
-      <div class="field">
-        <label>Alcance</label>
-        <input type="number" id="alcance">
-      </div>
+    <div class="g3" style="margin-bottom:12px">
+      <div class="field"><label>Curtidas</label><input type="number" id="curtidas"></div>
+      <div class="field"><label>Comentários</label><input type="number" id="comentarios"></div>
+      <div class="field"><label>Compartilhamentos</label><input type="number" id="compartilhamentos"></div>
+      <div class="field"><label>Salvamentos</label><input type="number" id="salvamentos"></div>
+      <div class="field"><label>Visualizações</label><input type="number" id="visualizacoes"></div>
+      <div class="field"><label>Alcance</label><input type="number" id="alcance"></div>
     </div>
-
-    <button class="send-btn" id="sendBtn" onclick="sendToSheets()">
-      <span>📤</span> Enviar para a planilha
-    </button>
-
+    <button class="btn btn-send" id="sendBtn" onclick="sendToSheets()">📤 Enviar para a planilha</button>
     <div id="sendStatus" class="hidden"></div>
   </div>
-
-  <div class="card hidden" id="historyCard">
-    <div class="card-title">Enviados hoje</div>
-    <div class="history" id="historyList"></div>
-  </div>
-
-</div><script>
+</div>
+<script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMe31CM6KLDoe-AYDtcXQVCdzZm_hLidBclwQvqUhqz3tMczCgCzF6Rs8NF62LgPxsSw/exec";
-const GEMINI_KEY = "AIzaSyD5WmCoa7bbHDxLSh0UEVB6r8Uim1gayHQ";
-const GEMINI_API = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
+const GEMINI_API = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyD5WmCoa7bbHDxLSh0UEVB6r8Uim1gayHQ";
 
 let imageBase64 = null;
-let history = [];
-
 document.getElementById('dataPost').valueAsDate = new Date();
-
-const zone = document.getElementById('uploadZone');
-zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
-zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
-zone.addEventListener('drop', e => {
-  e.preventDefault();
-  zone.classList.remove('drag');
-  const file = e.dataTransfer.files[0];
-  if (file) loadImage(file);
-});
 
 document.getElementById('fileInput').addEventListener('change', e => {
   if (e.target.files[0]) loadImage(e.target.files[0]);
+});
+
+document.getElementById('uploadZone').addEventListener('dragover', e => e.preventDefault());
+document.getElementById('uploadZone').addEventListener('drop', e => {
+  e.preventDefault();
+  if (e.dataTransfer.files[0]) loadImage(e.dataTransfer.files[0]);
 });
 
 function loadImage(file) {
@@ -531,117 +194,69 @@ function clearImage() {
   document.getElementById('fileInput').value = '';
 }
 
-function showStatus(el, type, msg) {
-  el.className = `status-bar ${type}`;
+function showStatus(id, type, msg) {
+  const el = document.getElementById(id);
+  el.className = 'status ' + type;
   el.classList.remove('hidden');
-  if (type === 'loading') {
-    el.innerHTML = `<div class="spinner"></div><span>${msg}</span>`;
-  } else {
-    const icon = type === 'success' ? '✅' : '❌';
-    el.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
-  }
+  el.innerHTML = type === 'loading'
+    ? `<div class="spin"></div><span>${msg}</span>`
+    : `<span>${type === 'success' ? '✅' : '❌'}</span><span>${msg}</span>`;
 }
 
 async function analyzeImage() {
-  if (!imageBase64) { alert('Sobe o print primeiro!'); return; }
+  if (!imageBase64) return alert('Sobe o print primeiro!');
+  if (!document.getElementById('cliente').value) return alert('Selecione o cliente!');
+  if (!document.getElementById('smResponsavel').value) return alert('Selecione o SM responsável!');
 
-  const cliente = document.getElementById('cliente').value;
-  const sm = document.getElementById('smResponsavel').value;
-  if (!cliente || !sm) { alert('Selecione o cliente e o SM responsável!'); return; }
-
-  const btn = document.getElementById('analyzeBtn');
-  const statusEl = document.getElementById('analyzeStatus');
-  btn.disabled = true;
-  showStatus(statusEl, 'loading', 'Analisando o print com IA...');
+  document.getElementById('analyzeBtn').disabled = true;
+  showStatus('analyzeStatus', 'loading', 'Analisando com IA...');
 
   try {
-    const prompt = `Analise este print de Insights do Instagram e extraia os dados. Responda APENAS em JSON válido, sem markdown, sem texto extra:
-{
-  "curtidas": número,
-  "comentarios": número,
-  "compartilhamentos": número,
-  "salvamentos": número,
-  "visualizacoes": número,
-  "alcance": número ou null se não aparecer,
-  "data_post": "DD/MM/AAAA" ou null,
-  "descricao": "texto visível no post ou descrição curta do conteúdo"
-}
-Converta "mil" para número (ex: 6,6 mil = 6600). Se algum dado não aparecer, use null.`;
+    const prompt = `Analise este print de Insights do Instagram. Responda SOMENTE com JSON válido, sem texto extra:
+{"curtidas":0,"comentarios":0,"compartilhamentos":0,"salvamentos":0,"visualizacoes":0,"alcance":null,"data_post":null,"descricao":""}
+Regras: converta "mil" para número (6,6 mil = 6600). Se não aparecer use null. data_post no formato DD/MM/AAAA.`;
 
     const res = await fetch(GEMINI_API, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        contents: [{
-          parts: [
-            { inline_data: { mime_type: 'image/jpeg', data: imageBase64 } },
-            { text: prompt }
-          ]
-        }]
+        contents: [{parts: [
+          {inline_data: {mime_type: 'image/jpeg', data: imageBase64}},
+          {text: prompt}
+        ]}]
       })
     });
 
     const data = await res.json();
+    if (!data.candidates) throw new Error(JSON.stringify(data));
     const text = data.candidates[0].content.parts[0].text;
-    const clean = text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
+    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
 
     document.getElementById('curtidas').value = parsed.curtidas || '';
     document.getElementById('comentarios').value = parsed.comentarios || '';
     document.getElementById('compartilhamentos').value = parsed.compartilhamentos || '';
     document.getElementById('salvamentos').value = parsed.salvamentos || '';
     document.getElementById('visualizacoes').value = parsed.visualizacoes || '';
-
-    const alcanceManual = document.getElementById('alcanceManual').value;
-    document.getElementById('alcance').value = alcanceManual || parsed.alcance || '';
-
+    const am = document.getElementById('alcanceManual').value;
+    document.getElementById('alcance').value = am || parsed.alcance || '';
     if (parsed.descricao) document.getElementById('descricaoPost').value = parsed.descricao;
-
     if (parsed.data_post) {
-      const parts = parsed.data_post.split('/');
-      if (parts.length === 3) {
-        document.getElementById('dataPost').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
-      }
+      const [d,m,y] = parsed.data_post.split('/');
+      if (d&&m&&y) document.getElementById('dataPost').value = `${y}-${m}-${d}`;
     }
 
-    const metrics = [
-      { label: 'Curtidas', value: fmt(parsed.curtidas) },
-      { label: 'Comentários', value: fmt(parsed.comentarios) },
-      { label: 'Compartilhamentos', value: fmt(parsed.compartilhamentos) },
-      { label: 'Salvamentos', value: fmt(parsed.salvamentos) },
-      { label: 'Visualizações', value: fmt(parsed.visualizacoes) },
-      { label: 'Alcance', value: alcanceManual ? fmt(parseInt(alcanceManual)) : (parsed.alcance ? fmt(parsed.alcance) : '—') },
-    ];
-
-    document.getElementById('metricsGrid').innerHTML = metrics.map(m => `
-      <div class="metric-card">
-        <div class="metric-label">${m.label}</div>
-        <div class="metric-value ${m.value !== '—' ? 'accent' : ''}">${m.value}</div>
-      </div>
+    const labels = ['Curtidas','Comentários','Compartilhamentos','Salvamentos','Visualizações','Alcance'];
+    const vals = [parsed.curtidas, parsed.comentarios, parsed.compartilhamentos, parsed.salvamentos, parsed.visualizacoes, am || parsed.alcance];
+    document.getElementById('metricsGrid').innerHTML = labels.map((l,i) => `
+      <div class="mc"><div class="ml">${l}</div><div class="mv">${vals[i] ? Number(vals[i]).toLocaleString('pt-BR') : '—'}</div></div>
     `).join('');
 
     document.getElementById('step2').classList.remove('hidden');
-    showStatus(statusEl, 'success', 'Dados extraídos! Confirme e envie para a planilha.');
-
-  } catch (err) {
-    showStatus(statusEl, 'error', 'Erro ao analisar: ' + err.message);
+    showStatus('analyzeStatus', 'success', 'Dados extraídos! Confirme e envie.');
+  } catch(err) {
+    showStatus('analyzeStatus', 'error', 'Erro: ' + err.message);
   }
-
-  btn.disabled = false;
-}
-
-function fmt(n) {
-  if (!n && n !== 0) return '—';
-  return n >= 1000 ? (n/1000).toFixed(1).replace('.0','') + 'k' : n.toString();
-}
-
-function calcEngajamento() {
-  const curtidas = parseInt(document.getElementById('curtidas').value) || 0;
-  const comentarios = parseInt(document.getElementById('comentarios').value) || 0;
-  const salvamentos = parseInt(document.getElementById('salvamentos').value) || 0;
-  const alcance = parseInt(document.getElementById('alcance').value) || 0;
-  if (alcance === 0) return '';
-  return ((curtidas + comentarios + salvamentos) / alcance * 100).toFixed(2) + '%';
+  document.getElementById('analyzeBtn').disabled = false;
 }
 
 async function sendToSheets() {
@@ -651,69 +266,40 @@ async function sendToSheets() {
   const tema = document.getElementById('tema').value;
   const dataVal = document.getElementById('dataPost').value;
   const descricao = document.getElementById('descricaoPost').value;
-  const curtidas = parseInt(document.getElementById('curtidas').value) || 0;
-  const comentarios = parseInt(document.getElementById('comentarios').value) || 0;
-  const compartilhamentos = parseInt(document.getElementById('compartilhamentos').value) || 0;
-  const salvamentos = parseInt(document.getElementById('salvamentos').value) || 0;
-  const visualizacoes = parseInt(document.getElementById('visualizacoes').value) || 0;
-  const alcance = parseInt(document.getElementById('alcance').value) || 0;
-  const eng = calcEngajamento();
+  const curtidas = parseInt(document.getElementById('curtidas').value)||0;
+  const comentarios = parseInt(document.getElementById('comentarios').value)||0;
+  const compartilhamentos = parseInt(document.getElementById('compartilhamentos').value)||0;
+  const salvamentos = parseInt(document.getElementById('salvamentos').value)||0;
+  const visualizacoes = parseInt(document.getElementById('visualizacoes').value)||0;
+  const alcance = parseInt(document.getElementById('alcance').value)||0;
+  const eng = alcance > 0 ? ((curtidas+comentarios+salvamentos)/alcance*100).toFixed(2)+'%' : '';
+  let data = '';
+  if (dataVal) { const [y,m,d] = dataVal.split('-'); data = `${d}/${m}/${y}`; }
 
-  let dataFormatada = '';
-  if (dataVal) {
-    const [y, m, d] = dataVal.split('-');
-    dataFormatada = `${d}/${m}/${y}`;
-  }
-
-  const linha = [dataFormatada, sm, formato, tema, descricao, curtidas, comentarios, compartilhamentos, salvamentos, visualizacoes, alcance, eng];
-
-  const btn = document.getElementById('sendBtn');
-  const statusEl = document.getElementById('sendStatus');
-  btn.disabled = true;
-  showStatus(statusEl, 'loading', 'Enviando para a planilha...');
+  document.getElementById('sendBtn').disabled = true;
+  showStatus('sendStatus', 'loading', 'Enviando para a planilha...');
 
   try {
     await fetch(SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ aba: cliente, linha })
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify({aba: cliente, linha: [data, sm, formato, tema, descricao, curtidas, comentarios, compartilhamentos, salvamentos, visualizacoes, alcance, eng]})
     });
-
-    showStatus(statusEl, 'success', `Adicionado na aba "${cliente}" com sucesso!`);
-
-    history.unshift({
-      texto: `${cliente} · ${sm} · ${formato} · ${dataFormatada}`,
-      hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-    });
-
-    renderHistory();
-    document.getElementById('historyCard').classList.remove('hidden');
-
+    showStatus('sendStatus', 'success', `Enviado para a aba "${cliente}"!`);
     setTimeout(() => {
       document.getElementById('step2').classList.add('hidden');
+      document.getElementById('analyzeStatus').classList.add('hidden');
+      document.getElementById('sendStatus').classList.add('hidden');
+      document.getElementById('sendBtn').disabled = false;
       clearImage();
       document.getElementById('descricaoPost').value = '';
       document.getElementById('alcanceManual').value = '';
-      document.getElementById('analyzeStatus').classList.add('hidden');
-      document.getElementById('sendStatus').classList.add('hidden');
-      btn.disabled = false;
     }, 3000);
-
-  } catch (err) {
-    showStatus(statusEl, 'error', 'Erro ao enviar: ' + err.message);
-    btn.disabled = false;
+  } catch(err) {
+    showStatus('sendStatus', 'error', 'Erro: ' + err.message);
+    document.getElementById('sendBtn').disabled = false;
   }
-}
-
-function renderHistory() {
-  document.getElementById('historyList').innerHTML = history.map(h => `
-    <div class="history-item">
-      <div class="history-dot"></div>
-      <div class="history-text">${h.texto}</div>
-      <div class="history-time">${h.hora}</div>
-    </div>
-  `).join('');
 }
 </script>
 </body>
