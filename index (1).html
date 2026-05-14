@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SM Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0d0f;--s:#15151a;--s2:#1d1d24;--b:#2a2a35;--a:#7c6af7;--a2:#c084fc;--g:#34d399;--r:#f87171;--t:#f0f0f5;--t2:#9090a8;--t3:#5a5a72}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--t);font-family:'DM Sans',sans-serif;min-height:100vh;padding:32px 24px}
+.container{max-width:720px;margin:0 auto}
+h1{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;background:linear-gradient(135deg,#fff,var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{color:var(--t2);font-size:13px;margin-top:4px;margin-bottom:32px}
+.card{background:var(--s);border:1px solid var(--b);border-radius:16px;padding:24px;margin-bottom:16px}
+.ctitle{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t2);margin-bottom:16px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+label{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em}
+input,select,textarea{background:var(--s2);border:1px solid var(--b);border-radius:8px;color:var(--t);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;width:100%;outline:none;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--a)}
+select{cursor:pointer}
+textarea{resize:vertical;min-height:60px}
+.upload{border:2px dashed var(--b);border-radius:10px;padding:28px;text-align:center;cursor:pointer;background:var(--s2);position:relative}
+.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload:hover{border-color:var(--a)}
+.prev{border-radius:10px;overflow:hidden;border:1px solid var(--b);margin-top:10px;position:relative}
+.prev img{width:100%;max-height:200px;object-fit:contain;display:block}
+.prev button{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.7);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px}
+.btn{width:100%;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;padding:13px;cursor:pointer;transition:opacity .2s;letter-spacing:.04em;margin-top:10px}
+.btn-ai{background:linear-gradient(135deg,var(--a),var(--a2));color:#fff}
+.btn-send{background:var(--g);color:#0d1a12;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.mc{background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:12px;text-align:center}
+.ml{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:4px}
+.mv{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--a2)}
+.status{border-radius:8px;padding:10px 14px;font-size:12px;display:flex;align-items:center;gap:8px;margin-top:10px}
+.status.loading{background:rgba(124,106,247,.1);color:var(--a2);border:1px solid rgba(124,106,247,.2)}
+.status.success{background:rgba(52,211,153,.1);color:var(--g);border:1px solid rgba(52,211,153,.2)}
+.status.error{background:rgba(248,113,113,.1);color:var(--r);border:1px solid rgba(248,113,113,.2)}
+.spin{width:14px;height:14px;border:2px solid rgba(124,106,247,.3);border-top-color:var(--a);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+.divider{height:1px;background:var(--b);margin:16px 0}
+.hist-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--b);border-radius:8px;margin-bottom:8px;font-size:12px}
+.hist-dot{width:7px;height:7px;border-radius:50%;background:var(--g);flex-shrink:0}
+.hist-txt{flex:1;color:var(--t2)}
+.hist-time{color:var(--t3);font-size:11px}
+@media(max-width:600px){.g2,.g3{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📊 SM Tracker</h1>
+  <p class="sub">Sobe o print · A IA lê os dados · Vai direto pra planilha</p>
+
+  <div class="card">
+    <div class="ctitle">1. Print do post</div>
+    <div class="upload" id="uploadZone">
+      <input type="file" id="fileInput" accept="image/*">
+      <div style="font-size:26px;margin-bottom:6px">📸</div>
+      <div style="font-size:13px;color:var(--t2)">Clique ou arraste o print aqui</div>
+      <div style="font-size:11px;color:var(--t3);margin-top:4px">PNG ou JPG — Insights do Instagram</div>
+    </div>
+    <div class="prev hidden" id="previewWrap">
+      <img id="previewImg" src="" alt="">
+      <button onclick="clearImage()">x</button>
+    </div>
+    <div class="divider"></div>
+    <div class="ctitle">2. Contexto do post</div>
+    <div class="g2" style="margin-bottom:12px">
+      <div class="field">
+        <label>Cliente</label>
+        <select id="cliente">
+          <option value="">Selecione...</option>
+          <option>Mowana</option><option>Lamartine</option><option>Josue Brandao</option>
+          <option>Projeto Vida</option><option>Mevam</option><option>Igor Miguel</option>
+          <option>Fer Brunet</option><option>Carol Bazzo</option><option>Helena Tannure</option>
+          <option>John</option><option>Reforma Digital</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>SM Responsavel</label>
+        <select id="smResponsavel">
+          <option value="">Selecione...</option>
+          <option>Sabine</option><option>Rubia</option><option>Rafa</option>
+          <option>Bella</option><option>Carol</option><option>Joao</option><option>Thiago</option>
+        </select>
+      </div>
+    </div>
+    <div class="g3" style="margin-bottom:12px">
+      <div class="field">
+        <label>Formato</label>
+        <select id="formato">
+          <option value="">Selecione...</option>
+          <option>Reels</option><option>Carrossel</option><option>Estatico</option><option>Stories</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tema</label>
+        <select id="tema">
+          <option value="">Selecione...</option>
+          <option>Lancamento</option><option>Institucional</option><option>Educativo</option>
+          <option>Devocional</option><option>Bastidor</option><option>CTA</option><option>Outro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Data do Post</label>
+        <input type="date" id="dataPost">
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Alcance (se nao aparecer no print)</label>
+      <input type="number" id="alcanceManual" placeholder="ex: 65025">
+    </div>
+    <button class="btn btn-ai" id="analyzeBtn" onclick="analyzeImage()">Analisar print com IA</button>
+    <div id="analyzeStatus" class="hidden"></div>
+  </div>
+
+  <div class="card hidden" id="step2">
+    <div class="ctitle">3. Confirme os dados</div>
+    <div class="metrics" id="metricsGrid"></div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Descricao do post</label>
+      <textarea id="descricaoPost" rows="2"></textarea>
+    </div>
+    <div class="g3" style="margin-bottom:12px">
+      <div class="field"><label>Curtidas</label><input type="number" id="curtidas"></div>
+      <div class="field"><label>Comentarios</label><input type="number" id="comentarios"></div>
+      <div class="field"><label>Compartilhamentos</label><input type="number" id="compartilhamentos"></div>
+      <div class="field"><label>Salvamentos</label><input type="number" id="salvamentos"></div>
+      <div class="field"><label>Visualizacoes</label><input type="number" id="visualizacoes"></div>
+      <div class="field"><label>Alcance</label><input type="number" id="alcance"></div>
+    </div>
+    <button class="btn btn-send" id="sendBtn" onclick="sendToSheets()">Enviar para a planilha</button>
+    <div id="sendStatus" class="hidden"></div>
+  </div>
+
+  <div class="card hidden" id="historyCard">
+    <div class="ctitle">Enviados hoje</div>
+    <div id="historyList"></div>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMe31CM6KLDoe-AYDtcXQVCdzZm_hLidBclwQvqUhqz3tMczCgCzF6Rs8NF62LgPxsSw/exec";
+const OPENROUTER_API = "https://openrouter.ai/api/v1/chat/completions";
+const OPENROUTER_KEY = "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";
+let imageBase64 = null, hist = [];
+document.getElementById('dataPost').valueAsDate = new Date();
+document.getElementById('fileInput').addEventListener('change', e => { if(e.target.files[0]) loadImage(e.target.files[0]); });
+document.getElementById('uploadZone').addEventListener('dragover', e => e.preventDefault());
+document.getElementById('uploadZone').addEventListener('drop', e => { e.preventDefault(); if(e.dataTransfer.files[0]) loadImage(e.dataTransfer.files[0]); });
+function loadImage(file) {
+  const r = new FileReader();
+  r.onload = ev => { imageBase64 = ev.target.result.split(',')[1]; document.getElementById('previewImg').src = ev.target.result; document.getElementById('previewWrap').classList.remove('hidden'); document.getElementById('uploadZone').classList.add('hidden'); };
+  r.readAsDataURL(file);
+}
+function clearImage() { imageBase64=null; document.getElementById('previewWrap').classList.add('hidden'); document.getElementById('uploadZone').classList.remove('hidden'); document.getElementById('fileInput').value=''; }
+function showStatus(id, type, msg) {
+  const el = document.getElementById(id);
+  el.className = 'status ' + type;
+  el.classList.remove('hidden');
+  el.innerHTML = type==='loading' ? '<div class="spin"></div><span>'+msg+'</span>' : '<span>'+(type==='success'?'OK':'ERRO')+'</span><span> '+msg+'</span>';
+}
+async function analyzeImage() {
+  if(!imageBase64) return alert('Sobe o print primeiro!');
+  if(!document.getElementById('cliente').value) return alert('Selecione o cliente!');
+  if(!document.getElementById('smResponsavel').value) return alert('Selecione o SM!');
+  document.getElementById('analyzeBtn').disabled = true;
+  showStatus('analyzeStatus','loading','Analisando com IA...');
+  try {
+    const prompt = 'Analise este print de Insights do Instagram. Responda SOMENTE com JSON valido sem texto extra: {"curtidas":0,"comentarios":0,"compartilhamentos":0,"salvamentos":0,"visualizacoes":0,"alcance":null,"data_post":null,"descricao":""}. Converta mil para numero (6,6 mil = 6600). Se nao aparecer use null. data_post no formato DD/MM/AAAA.';
+    const res = await fetch(OPENROUTER_API, { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+OPENROUTER_KEY}, body: JSON.stringify({ model:'google/gemini-2.0-flash-001', messages:[{role:'user',content:[{type:'image_url',image_url:{url:'data:image/jpeg;base64,'+imageBase64}},{type:'text',text:prompt}]}] }) });
+    const data = await res.json();
+    if(!data.choices) throw new Error(JSON.stringify(data));
+    const parsed = JSON.parse(data.choices[0].message.content.replace(/```json|```/g,'').trim());
+    document.getElementById('curtidas').value = parsed.curtidas||'';
+    document.getElementById('comentarios').value = parsed.comentarios||'';
+    document.getElementById('compartilhamentos').value = parsed.compartilhamentos||'';
+    document.getElementById('salvamentos').value = parsed.salvamentos||'';
+    document.getElementById('visualizacoes').value = parsed.visualizacoes||'';
+    const am = document.getElementById('alcanceManual').value;
+    document.getElementById('alcance').value = am||parsed.alcance||'';
+    if(parsed.descricao) document.getElementById('descricaoPost').value = parsed.descricao;
+    if(parsed.data_post){const[d,m,y]=parsed.data_post.split('/');if(d&&m&&y)document.getElementById('dataPost').value=y+'-'+m+'-'+d;}
+    const labels=['Curtidas','Comentarios','Compartilhamentos','Salvamentos','Visualizacoes','Alcance'];
+    const vals=[parsed.curtidas,parsed.comentarios,parsed.compartilhamentos,parsed.salvamentos,parsed.visualizacoes,am||parsed.alcance];
+    document.getElementById('metricsGrid').innerHTML = labels.map((l,i)=>'<div class="mc"><div class="ml">'+l+'</div><div class="mv">'+(vals[i]?Number(vals[i]).toLocaleString('pt-BR'):'---')+'</div></div>').join('');
+    document.getElementById('step2').classList.remove('hidden');
+    showStatus('analyzeStatus','success','Dados extraidos! Confirme e envie.');
+  } catch(err) { showStatus('analyzeStatus','error',err.message); }
+  document.getElementById('analyzeBtn').disabled = false;
+}
+async function sendToSheets() {
+  const cliente=document.getElementById('cliente').value, sm=document.getElementById('smResponsavel').value;
+  const formato=document.getElementById('formato').value, tema=document.getElementById('tema').value;
+  const dataVal=document.getElementById('dataPost').value, desc=document.getElementById('descricaoPost').value;
+  const c=parseInt(document.getElementById('curtidas').value)||0, co=parseInt(document.getElementById('comentarios').value)||0;
+  const cp=parseInt(document.getElementById('compartilhamentos').value)||0, s=parseInt(document.getElementById('salvamentos').value)||0;
+  const v=parseInt(document.getElementById('visualizacoes').value)||0, a=parseInt(document.getElementById('alcance').value)||0;
+  const eng = a>0?((c+co+s)/a*100).toFixed(2)+'%':'';
+  let dt=''; if(dataVal){const[y,m,d]=dataVal.split('-');dt=d+'/'+m+'/'+y;}
+  document.getElementById('sendBtn').disabled=true;
+  showStatus('sendStatus','loading','Enviando para a planilha...');
+  try {
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({aba:cliente,linha:[dt,sm,formato,tema,desc,c,co,cp,s,v,a,eng]})});
+    showStatus('sendStatus','success','Enviado para a aba "'+cliente+'"!');
+    hist.unshift({txt:cliente+' - '+sm+' - '+formato+' - '+dt, hora:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});
+    document.getElementById('historyList').innerHTML = hist.map(h=>'<div class="hist-item"><div class="hist-dot"></div><div class="hist-txt">'+h.txt+'</div><div class="hist-time">'+h.hora+'</div></div>').join('');
+    document.getElementById('historyCard').classList.remove('hidden');
+    setTimeout(()=>{ document.getElementById('step2').classList.add('hidden'); clearImage(); document.getElementById('descricaoPost').value=''; document.getElementById('alcanceManual').value=''; document.getElementById('analyzeStatus').classList.add('hidden'); document.getElementById('sendStatus').classList.add('hidden'); document.getElementById('sendBtn').disabled=false; },3000);
+  } catch(err) { showStatus('sendStatus','error',err.message); document.getElementById('sendBtn').disabled=false; }
+}
+</script>
+</body>
+</html>
